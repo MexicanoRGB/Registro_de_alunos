@@ -1,4 +1,4 @@
-# Registro_de_alunos
+# Sistema_de_alunos
 
 # Desenvolvedor
   Miguel Martins
