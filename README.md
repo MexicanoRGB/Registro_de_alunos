@@ -1,7 +1,8 @@
 # Sistema_de_alunos
 
-# Desenvolvedor
+# Desenvolvedores
   Miguel Martins
+  Karina Braga
 
 # Descrição
   Registro_de_alunos faça o cadastro de gerenciamento de alunos usando pandas e CSV
