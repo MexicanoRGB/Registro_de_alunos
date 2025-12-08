@@ -1,7 +1,7 @@
 # Sistema_de_alunos
 
 # Desenvolvedores
-  Miguel Martins
+  Miguel Martins e 
   Karina Braga
 
 # Descrição
