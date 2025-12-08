@@ -15,4 +15,5 @@
   pip install pandas
 
 # Commits
-  o fato de eu fazer tudo e depois colocar no GitHub não está me ajudando (eu esqueci de fazer os comits emquanto eu fazia o projeto)
+  O projeto foi publicado no dia 7/12 de maneira simples e basica
+  no dia 8/12 foi adicionado o tkinter para ter um menu apropriado (ainda contem erros)
