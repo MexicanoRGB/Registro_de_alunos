@@ -1,6 +1,8 @@
 #Sistema De Alunos
 import os
 import pandas as pd
+import tkinter as tk
+from tkinter import messagebox, ttk
 
 CSV_FILE = 'alunos.csv'
 CAMPOS = ['Matricula', 'Nome', 'Rua', 'Numero', 'Bairro', 'Cidade', 'UF', 'Telefone', 'Email']
@@ -157,29 +159,72 @@ def buscar_por_nome(df, nome):
     mask = df['Nome'].str.lower().str.contains(nome_proc, na=False)
     return df[mask]
 
-def pesquisar(df):
-    print('=== PESQUISAR ALUNO ===')
-    print('1 - Por Matrícula')
-    print('2 - Por Nome')
-    opc = input('Escolha uma opção (1-2): ').strip()
-    if opc == '1':
-        matricula = input_nonempty('Digite a matrícula: ')
-        df_matches = buscar_por_matricula(df, matricula)
-    elif opc == '2':
-        nome = input_nonempty('Digite o nome (ou parte dele): ')
-        df_matches = buscar_por_nome(df, nome)
-    else:
-        print('Opção inválida.')
-        return df
-    registro = escolher_registro(df_matches)
-    if registro is None or registro.empty:
-        print('Nenhum aluno selecionado.')
-        return df
+def pesquisar(df, root):#pesquisa aluno
+    df = load_data()
     
-    mostrar_aluno(registro)
-    df = editar_registro(df, registro)
+    win = tk.Toplevel(root)
+    win.title("Pesquisar Aluno")
+    win.geometry("500x400")
+    frm = ttk.Frame(win, padding=20)
+    frm.pack(fill="both", expand=True)
+    
+    tk.Label(frm, text="Pesquisar Aluno", font=("Arial", 14, "bold")).pack(pady=10)
+    entrada = tk.Entry(frm)
+    entrada.pack(fill="x", pady=5)
+    
+    resultados_box = tk.Listbox(frm, height=15)
+    resultados_box.pack(fill="both", expand=True, pady=10)
+    
+    def atualizar_resultados(event=None):
+        resultados_box.delete(0, tk.END)
+        termo = entrada.get().strip()
+        if termo == '':
+            return
+        try:
+            num = int(termo)
+            resultados = df[df["Matricula"] == num]
+        except ValueError:
+            resultados = df[df["Nome"].str.lower().str.contains(termo)]
+            
+        for _, r in resultados.iterrows():
+            resultados_box.insert(tk.END, f"Matrícula: {r['Matricula']} - Nome: {r['Nome']}")
+            
+    def editar_sel():
+        sel = resultados_box.curselection()
+        if not sel:
+            messagebox.showinfo("Info", "Nenhum aluno selecionado.")
+            return
+        texto = resultados_box.get(sel[0])
+        matricula = int(texto.split(" - ")[0])
+        registro = df[df["Matricula"] == matricula].iloc[0]
+
+        editar_registro(df, registro, atualizar_resultados)
+    
+    tk.Button(frm, text="Buscar", command=atualizar_resultados).pack(pady=5)
+    tk.Button(frm, text="Editar Selecionado", command=editar_sel).pack(pady=5)
         
-    return df
+    # print('=== PESQUISAR ALUNO ===')
+    # print('1 - Por Matrícula')
+    # print('2 - Por Nome')
+    # opc = input('Escolha uma opção (1-2): ').strip()
+    # if opc == '1':
+    #     matricula = input_nonempty('Digite a matrícula: ')
+    #     df_matches = buscar_por_matricula(df, matricula)
+    # elif opc == '2':
+    #     nome = input_nonempty('Digite o nome (ou parte dele): ')
+    #     df_matches = buscar_por_nome(df, nome)
+    # else:
+    #     print('Opção inválida.')
+    #     return df
+    # registro = escolher_registro(df_matches)
+    # if registro is None or registro.empty:
+    #     print('Nenhum aluno selecionado.')
+    #     return df
+    
+    # mostrar_aluno(registro)
+    # df = editar_registro(df, registro)
+        
+    # return df
 
 def escolher_registro(df_matches):#escolhe registro entre 2 ou mais resultados
     if df_matches.empty:
@@ -199,54 +244,93 @@ def escolher_registro(df_matches):#escolhe registro entre 2 ou mais resultados
             return sel.iloc[0]
         print('Matrícula inválida para os resultados mostrados. Tente novamente.')
 
-def editar_registro(df, registro):#só pra editar o registro de um aluno pqp
-    if registro is None:
-        print('Nenhum registro para editar.')
-        return df
-    resp = input('Deseja editar este registro? (s/n): ').strip().lower()
-    mostrar_aluno(registro)
-    if resp != 's':
-        return df
-    campos_editaveis = [c for c in CAMPOS if c != 'Matricula']
-    while True:
-        print('Campos editáveis:')
-        for i, c in enumerate(campos_editaveis, start=1):
-            print(f'{i} - {c}')
-        print('0 - Sair da edição')
-        print('R - Remover registro')
-        escolha = input('Escolha o campo que deseja editar (0 para sair): ').strip().lower()
+def editar_registro(df, registro, atualizar_callback):#só pra editar o registro de um aluno pqp
+    win = tk.Toplevel()
+    win.title("Editar Aluno")
+    win.geometry("400x500")
+    
+    frm = ttk.Frame(win, padding=10)
+    frm.pack(fill="both", expand=True)
+    
+    entradas = {}
+
+    tk.Label(frm, text=f"Editar Aluno (Matrícula {registro['Matricula']})",font=("Arial", 14, "bold")).pack(pady=10)
+    for campo in CAMPOS[1:]:
+        tk.Label(frm, text=campo + ":").pack(anchor="w")
+        ent = tk.Entry(frm)
+        ent.insert(0, registro[campo])
+        ent.pack(fill="x", pady=5)
+        entradas[campo] = ent
         
-        if escolha == 'r':
-            # opção para remover
-            mostrar_aluno(registro)
-            resp_remover = input('Deseja remover este registro? (s/n): ').strip().lower()
-            if resp_remover == 's':
-                df2 = df[df['Matricula'] != int(registro['Matricula'])]
-                save_data(df2)
-                print('Registro removido.')
-                return df2
-            else:
-                print('Remoção cancelada.')
-                continue
+    def salvar():
+        for campo, widget in entradas.items():
+            # novo_valor = ent.get().strip()
+            df.loc[df['Matricula'] == int(registro['Matricula']), campo] = widget.get().strip()
+        save_data(df)
+        messagebox.showinfo("Sucesso", "Registro atualizado!")
+        atualizar_callback()
+        win.destroy()
         
-        if escolha == '0':
-            break
-        try:
-            idx = int(escolha) - 1
-            if idx < 0 or idx >= len(campos_editaveis):
-                raise ValueError
-        except ValueError:
-            print('Opção inválida. Tente novamente.')
-            continue
-        campo = campos_editaveis[idx]
-        valor_atual = registro[campo]
-        novo = input_nonempty(f'Valor atual ({campo}) = "{valor_atual}". Novo valor (Enter = manter): ', default=valor_atual)
-        df.loc[df['Matricula'] == registro['Matricula'], campo] = novo
-        registro = df[df['Matricula'] == int(registro['Matricula'])].iloc[0]
-        print(f'Campo "{campo}" atualizado.')
-    save_data(df)
-    print('Edição finalizada e salva.')
+    def remover():
+        resp = messagebox.askyesno("Confirmação", "Deseja remover este registro?")
+        if resp:
+            df2 = df[df['Matricula'] != int(registro['Matricula'])]
+            save_data(df2)
+            messagebox.showinfo("Sucesso", "Registro removido!")
+            atualizar_callback()
+            win.destroy()
+    
+    tk.Button(frm, text="Salvar Alterações", command=salvar).pack(pady=10)
+    tk.Button(frm, text="Remover Aluno", command=remover).pack(pady=10)
+    tk.Button(frm, text="Cancelar", command=win.destroy).pack(pady=5)
     return df
+    # if registro is None:
+    #     print('Nenhum registro para editar.')
+    #     return df
+    # resp = input('Deseja editar este registro? (s/n): ').strip().lower()
+    # mostrar_aluno(registro)
+    # if resp != 's':
+    #     return df
+    # campos_editaveis = [c for c in CAMPOS if c != 'Matricula']
+    # while True:
+    #     print('Campos editáveis:')
+    #     for i, c in enumerate(campos_editaveis, start=1):
+    #         print(f'{i} - {c}')
+    #     print('0 - Sair da edição')
+    #     print('R - Remover registro')
+    #     escolha = input('Escolha o campo que deseja editar (0 para sair): ').strip().lower()
+        
+    #     if escolha == 'r':
+    #         # opção para remover
+    #         mostrar_aluno(registro)
+    #         resp_remover = input('Deseja remover este registro? (s/n): ').strip().lower()
+    #         if resp_remover == 's':
+    #             df2 = df[df['Matricula'] != int(registro['Matricula'])]
+    #             save_data(df2)
+    #             print('Registro removido.')
+    #             return df2
+    #         else:
+    #             print('Remoção cancelada.')
+    #             continue
+        
+    #     if escolha == '0':
+    #         break
+    #     try:
+    #         idx = int(escolha) - 1
+    #         if idx < 0 or idx >= len(campos_editaveis):
+    #             raise ValueError
+    #     except ValueError:
+    #         print('Opção inválida. Tente novamente.')
+    #         continue
+    #     campo = campos_editaveis[idx]
+    #     valor_atual = registro[campo]
+    #     novo = input_nonempty(f'Valor atual ({campo}) = "{valor_atual}". Novo valor (Enter = manter): ', default=valor_atual)
+    #     df.loc[df['Matricula'] == registro['Matricula'], campo] = novo
+    #     registro = df[df['Matricula'] == int(registro['Matricula'])].iloc[0]
+    #     print(f'Campo "{campo}" atualizado.')
+    # save_data(df)
+    # print('Edição finalizada e salva.')
+    # return df
 
 def remover_registro(df, registro):
     if registro is None:
@@ -262,22 +346,36 @@ def remover_registro(df, registro):
     print('Registro removido.')
     return df2
 
-def main():
-    df = load_data()
-    while True:
-        print('\n=== MENU PRINCIPAL ===')
-        print('1 - INSERIR')
-        print('2 - PESQUISAR')
-        print('3 - SAIR')
-        opc = input('Escolha uma opção (1-3): ').strip()
-        if opc == '1':
-            df = inserir(df)
-        elif opc == '2':
-            df = pesquisar(df)
-        elif opc == '3':
-            print('Saindo do sistema. Até logo!')
-            break
-        else:
-            print('Opção inválida. Tente novamente.')
+def main(): #menu principal
+    root = tk.Tk()
+    root.title("Sistema De Alunos")
+    root.geometry("300x250")
+    
+    frm = ttk.Frame(root, padding=20)
+    frm.pack(fill="both", expand=True)
+    
+    tk.Label(frm, text="Sistema De Alunos", font=("Arial", 16, "bold")).pack(pady=10)
+    
+    tk.Button(frm, text="Inserir Aluno", width=20, command=lambda: inserir(load_data())).pack(pady=5)
+    tk.Button(frm, text="Pesquisar Aluno", width=20, command=lambda: pesquisar(load_data(), root)).pack(pady=5)
+    tk.Button(frm, text="Sair", width=20, command=root.quit).pack(pady=5)
+    root.mainloop()
+    
+    # df = load_data()
+    # while True:
+    #     print('\n=== MENU PRINCIPAL ===')
+    #     print('1 - INSERIR')
+    #     print('2 - PESQUISAR')
+    #     print('3 - SAIR')
+    #     opc = input('Escolha uma opção (1-3): ').strip()
+    #     if opc == '1':
+    #         df = inserir(df)
+    #     elif opc == '2':
+    #         df = pesquisar(df)
+    #     elif opc == '3':
+    #         print('Saindo do sistema. Até logo!')
+    #         break
+    #     else:
+    #         print('Opção inválida. Tente novamente.')
 if __name__ == "__main__":
     main()
