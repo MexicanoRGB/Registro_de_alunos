@@ -17,3 +17,4 @@
 # Commits
   O projeto foi publicado no dia 7/12 de maneira simples e basica
   no dia 8/12 foi adicionado o tkinter para ter um menu apropriado (ainda contem erros)
+  no dia 9/12 os erros que tinha o tkinter foram corrigidos (eu espero)
