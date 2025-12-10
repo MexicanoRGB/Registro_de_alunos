@@ -9,15 +9,14 @@
 
 ## Descrição
 
-Este projeto implementa um sistema de gerenciamento de alunos utilizando **Python**, **pandas** e armazenamento em arquivo **CSV**.
+Este projeto é um sistema de gerenciamento de alunos utilizando **Python**, **pandas** e armazenamento em arquivo **CSV**.
 
 O sistema permite:
 
 * Inserir novos alunos
-* Pesquisar por matrícula ou nome (case-insensitive)
+* Pesquisar por matrícula ou nome
 * Editar dados do aluno (exceto matrícula)
 * Remover registros com confirmação
-* Utilizar uma interface Tkinter para facilitar o uso
 
 ---
 
@@ -44,7 +43,7 @@ pip install pandas
 python "Sistema De Alunos.py"
 ```
 
-O arquivo `alunos.csv` será criado automaticamente caso não exista.
+O arquivo `alunos.csv` será criado automaticamente caso não o exista previamente.
 
 ---
 
