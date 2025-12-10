@@ -124,7 +124,7 @@ def inserir(root):
         df = load_data()
         matricula = generate_matricula(load_data())
         
-        # Completar email automaticamente
+        # completa email automaticamente
         email_completo = completar_email(values['Email'])
         
         registro = {
@@ -269,7 +269,7 @@ def pesquisar(df, root):#pesquisa aluno
     resultados_box = tk.Listbox(frm, height=15)
     resultados_box.pack(fill="both", expand=True, pady=10)
     
-    #pq menu é tão complicado meu deus "pq eu fiz esse comentario?"
+    #pq menu é tão complicado meu deus <-"pq eu fiz esse comentario?"
     
     def atualizar_resultados():
         termo = entrada.get().strip().lower()
@@ -298,7 +298,7 @@ def pesquisar(df, root):#pesquisa aluno
         # for _, r in resultados.iterrows():
         #     resultados_box.insert(tk.END, f"Matrícula: {r['Matricula']} - Nome: {r['Nome']}")
         
-        #codigo grande antigo usado como referenica
+        #codigo antigo usado como referenica
             
     def editar_sel():
         sel = resultados_box.curselection()
@@ -337,7 +337,7 @@ def pesquisar(df, root):#pesquisa aluno
         
     # return df
     
-    #codigo grande antigo usado como referenica
+    #codigo antigo usado como referenica
 
 def escolher_registro(df_matches):#escolhe registro entre 2 ou mais resultados
     if df_matches.empty:
@@ -504,3 +504,4 @@ def main(): #menu principal
     
 if __name__ == "__main__":
     main()
+
