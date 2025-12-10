@@ -56,17 +56,6 @@ O arquivo `alunos.csv` será criado automaticamente caso não exista.
 
 ---
 
-## Commits
-
-O uso correto de Git e GitHub faz parte da avaliação. Recomenda-se:
-
-* Fazer **commits pequenos e frequentes**.
-* Utilizar mensagens claras e diretamente relacionadas às mudanças, como:
-
-  * "Adiciona função de pesquisa por nome"
-  * "Corrige bug no cadastro de alunos"
-  * "Implementa interface Tkinter"
-
 ### Histórico do Projeto
 
 * **07/12** – Publicação inicial do sistema no modo terminal.
