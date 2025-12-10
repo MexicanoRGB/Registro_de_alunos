@@ -10,7 +10,7 @@
 # Requisitos
   Python 3.8+
   e pandas
-  para intalar a biblioteca pandas faça o seguinte
+  para instalar a biblioteca pandas faça o seguinte
   va até o terminal do VScode e digite
   pip install pandas
 
