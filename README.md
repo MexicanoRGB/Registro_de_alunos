@@ -41,7 +41,7 @@ pip install pandas
 3. Execute o comando:
 
 ```bash
-python Sistema\ De\ Alunos.py
+python Sistema De Alunos.py
 ```
 
 O arquivo `alunos.csv` será criado automaticamente caso não exista.
